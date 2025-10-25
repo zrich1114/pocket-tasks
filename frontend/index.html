@@ -4,10 +4,22 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Pocket Tasks</title>
   </head>
   <body>
-    <div id="app"></div>
+    <main class="container">
+      <h1>Pocket Tasks</h1>
+      <form id="new-task-form">
+        <input type="title" placeholder="What needs doing?" />
+        <button type="submit">Add</button>
+        <select id="filter">
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+      </form>
+      <ul id="task-list" class="tasks"></ul>
+    </main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
