@@ -21,5 +21,5 @@ export const TaskUpdate = Task.partial().refine(
 );
 
 export type Task = z.infer<typeof Task>;
-export type TaskCreate = z.infer<typeof Task>;
-export type TaskUpdate = z.infer<typeof Task>;
+export type TaskCreate = z.infer<typeof TaskCreate>;
+export type TaskUpdate = z.infer<typeof TaskUpdate>;
