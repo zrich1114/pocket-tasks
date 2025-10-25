@@ -1,6 +1,6 @@
 import { Task, TaskCreate, TaskUpdate } from "../../shared/task.schema";
 
-const BASE = "http://localhost:5174/api";
+const BASE = import.meta.env.VITE_API_BASE ?? "/api";
 
 export async function listTasks(): Promise<Task[]> {
   const res = await fetch(`${BASE}/tasks`);
