@@ -1,0 +1,25 @@
+import { z } from "zod";
+
+export const Task = z.object({
+  id: z.uuid(),
+  title: z.string().min(1).max(200),
+  notes: z.string().max(2000).optional(),
+  dueDate: z.date().optional(),
+  completed: z.boolean().default(false),
+  creadedAt: z.date(),
+});
+
+export const TaskCreate = Task.pick({
+  title: true,
+  notes: true,
+  dueDate: true,
+});
+
+export const TaskUpdate = Task.partial().refine(
+  (data) => Object.keys(data).length > 0,
+  "Provide at least one field to update."
+);
+
+export type Task = z.infer<typeof Task>;
+export type TaskCreate = z.infer<typeof Task>;
+export type TaskUpdate = z.infer<typeof Task>;
