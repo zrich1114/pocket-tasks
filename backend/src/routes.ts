@@ -6,34 +6,54 @@ import { Task, TaskCreate, TaskUpdate } from "../../shared/task.schema";
 const router = Router();
 
 router.get("/tasks", (req, res) => {
-  const rows: Task[] = db
-    .prepare("SELECT * FROM tasks ORDER BY createdAt DESC")
-    .all() as Task[];
-
-  // Coerce db types and validate
-  const tasks = rows.map((row) =>
+  const rows = db.prepare("SELECT * FROM tasks ORDER BY createdAt DESC").all();
+  const tasks = rows.map((row: any) =>
     Task.parse({
-      ...row,
+      id: row.id,
+      title: row.title,
+      notes: row.notes ?? undefined,
+      dueDate: row.dueDate ?? undefined,
       completed: !!row.completed,
+      createdAt: row.createdAt,
     })
   );
   res.json(tasks);
 });
 
 router.post("/tasks", (req, res) => {
-  const body = TaskCreate.parse(req.body);
-  const id = randomUUID();
-  const createdAt = new Date().toISOString();
+  try {
+    const body = TaskCreate.parse(req.body);
+    const id = randomUUID();
+    const createdAt = new Date().toISOString();
 
-  db.prepare(
-    `
+    const params = {
+      id,
+      title: body.title,
+      notes: body.notes ?? undefined,
+      dueDate: body.dueDate ?? undefined,
+      createdAt,
+    };
+
+    db.prepare(
+      `
     INSERT INTO tasks (id, title, notes, dueDate, completed, createdAt)
     VALUES (@id, @title, @notes, @dueDate, 0, @createdAt)  
   `
-  ).run({ id, ...body, createdAt });
+    ).run(params);
 
-  const task = Task.parse({ id, ...body, completed: false, createdAt });
-  res.status(201).json(task);
+    const task = Task.parse({
+      id,
+      ...body,
+      notes: body.notes,
+      dueDate: body.dueDate,
+      completed: false,
+      createdAt,
+    });
+    res.status(201).json(task);
+  } catch (e: any) {
+    console.error("POST /tasks failed: ", e);
+    res.status(400).json({ error: e?.message ?? "Bad Request" });
+  }
 });
 
 router.patch("/tasks/:id", (req, res) => {
@@ -53,7 +73,12 @@ router.patch("/tasks/:id", (req, res) => {
   if (info.changes === 0) return res.status(404).json({ error: "Not found" });
 
   const row = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id) as Task;
-  const updated = Task.parse({ ...row, completed: !!row.completed });
+  const updated = Task.parse({
+    ...row,
+    notes: row.notes ?? "",
+    dueDate: row.dueDate ?? undefined,
+    completed: !!row.completed,
+  });
 
   res.json(updated);
 });

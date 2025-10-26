@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "dev:server": "ts-node-dev --respawn --transpile-only --project backend/tsconfig.json backend/src/server.ts",
-    "dev:client": "vite --config frontend.config.ts",
+    "dev:client": "vite --config frontend/vite.config.ts",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
     "build": "vite build --config frontend/vite.config.ts",
     "test": "vitest"

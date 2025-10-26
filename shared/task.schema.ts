@@ -4,9 +4,18 @@ export const Task = z.object({
   id: z.uuid(),
   title: z.string().min(1).max(200),
   notes: z.string().max(2000).optional(),
-  dueDate: z.date().optional(),
+  dueDate: z
+    .string()
+    .optional()
+    .refine((s) => s === undefined || !isNaN(Date.parse(s)), {
+      message: "Invalid ISO date string",
+    }),
   completed: z.boolean().default(false),
-  creadedAt: z.date(),
+  createdAt: z
+    .string()
+    .refine((s) => !isNaN(Date.parse(s)), {
+      message: "Invalid ISO date string",
+    }),
 });
 
 export const TaskCreate = Task.pick({
